@@ -1,5 +1,7 @@
 package domain
 
+/*Classe responsável pelos comandos no banco de dados*/
+
 import (
 	"database/sql"
 	"fmt"
@@ -71,7 +73,7 @@ func InserirDadosBancoCompra(cpf string, private int, incompleto int, dataCompra
 	}
 }
 
-func sqlSelect() map[int]Compra {
+func SqlSelect() map[int]Compra {
 	dadosCompras := make(map[int]Compra)
 
 	sqlStatement, err := db.Query("SELECT cpf,dtultcompra,lojamaisfreq FROM " + dbconfig.TableName)

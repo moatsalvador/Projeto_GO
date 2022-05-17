@@ -24,11 +24,16 @@ func main() {
 	compra.ConectarBanco()
 	compra.CriartabelaRegistro()
 
+	//realiza a leitura do arquivo
 	dados := compra.LeArquivo()
+	//realiza o processamento do arquivo inserindo os dados no banco
 	dadosCompras := compra.ProcessarDados(dados)
 	fmt.Println("Foram processados: ", len(dadosCompras), "dados")
 	fmt.Println("Dados inseridos")
 
+	compra.ValidarDadosCPF()
+
+	//desconecta no banco
 	compra.DesconectarBanco()
 
 	//transforma os dados do map em um json

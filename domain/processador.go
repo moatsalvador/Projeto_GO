@@ -63,11 +63,6 @@ func ProcessarDados(dados []string) map[int]Compra {
 		ticketUltcomp := converterValor(dado[87:111])
 		lojaultcomp := strings.TrimSpace(dado[111:130])
 		lojmaisfreq := strings.TrimSpace(dado[131:])
-		if valid.IsCPF(cpf) {
-			fmt.Print(cpf, " Valido -- ")
-		} else {
-			fmt.Print(cpf, " Invalido -- ")
-		}
 		dadosCompras[i+1] = Compra{CPF: cpf, Private: private, Incompleto: incompleto, DtUltCompra: dataCompra, TicketMedio: tiketmedio, TicketUltComp: ticketUltcomp, LojaMaisFreq: lojmaisfreq, LojaUltComp: lojaultcomp}
 		//fmt.Println("Compra é do tipo ", reflect.TypeOf(compra))
 		InserirDadosBancoCompra(cpf, private, incompleto, dataCompra, tiketmedio, ticketUltcomp, lojmaisfreq, lojaultcomp)
@@ -88,6 +83,18 @@ func converterValor(valor string) float64 {
 			return 0
 		} else {
 			return valorF
+		}
+	}
+}
+
+func ValidarDadosCPF() {
+	dadosCompras := make(map[int]Compra)
+	dadosCompras = SqlSelect()
+	for _, dado := range dadosCompras {
+		if valid.IsCPF(dado.CPF) {
+			fmt.Print(dado.CPF, " Valido -- ")
+		} else {
+			fmt.Print(dado.CPF, " Invalido -- ")
 		}
 	}
 }
