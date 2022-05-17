@@ -1,13 +1,30 @@
 version: '3.5'
+networks:
+  products-network:
+    name: "compras-network"
 volumes:
   data:
 
 services:
+  app:
+    container_name: api_compras
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: build
+    environment:
+      POSTGRES_URL: "postgres://postgres:admin@db_projcompras:5432/compras?sslmode=disable"
+    ports:
+      - "8080:8080"
+    links:
+      - db
+    networks:
+      - products-network
   db:
     image: postgres:12-alpine
     container_name: db_projcompras
     environment:
-      POSTGRES_DB: comprasdb
+      POSTGRES_DB: compras
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
     ports:
