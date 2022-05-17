@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 
@@ -31,21 +30,10 @@ func main() {
 	fmt.Println("Foram processados: ", len(dadosCompras), "dados")
 	fmt.Println("Dados inseridos")
 
-	compra.ValidarDadosCPF()
+	compra.ValidarDadosBanco()
 
 	//desconecta no banco
 	compra.DesconectarBanco()
-
-	//transforma os dados do map em um json
-	arqJson, err := json.Marshal(dadosCompras)
-	if err != nil {
-		fmt.Println("Ocorreu um erro: ", err)
-	} else {
-		//fmt.Println(string(arqJson))
-		registraArquivo(string(arqJson))
-	}
-	//sqlSelect()
-
 }
 
 func registraArquivo(linha string) {

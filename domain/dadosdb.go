@@ -73,10 +73,32 @@ func InserirDadosBancoCompra(cpf string, private int, incompleto int, dataCompra
 	}
 }
 
+//Inserir dados no banco com os dados do tipo Compra
+func InserirDadosDeCompra(dados Compra) {
+	sqlStatement := fmt.Sprintf("INSERT INTO %s (cpf, private, incompleto, dtultcompra, ticketmedio, tickectultcomp, lojamaisfreq, lojaultcompra) VALUES ($1,$2, $3, $4, $5, $6, $7, $8)", dbconfig.TableName)
+
+	//inserir no banco
+	insert, err := db.Prepare(sqlStatement)
+	checkErr(err)
+
+	result, err := insert.Exec(dados.CPF, dados.Private, dados.Incompleto, dados.DtUltCompra, dados.TicketMedio, dados.TicketUltComp, dados.LojaMaisFreq, dados.LojaUltComp)
+	checkErr(err)
+
+	affect, err := result.RowsAffected()
+	checkErr(err)
+
+	//	println("inserido :", dados.CPF, affect)
+
+	if affect > 1 {
+		println("Inseriu mais de um registro")
+	}
+}
+
+//Seleciona os dados do banco para fazer a validação de documentos
 func SqlSelect() map[int]Compra {
 	dadosCompras := make(map[int]Compra)
 
-	sqlStatement, err := db.Query("SELECT cpf,dtultcompra,lojamaisfreq FROM " + dbconfig.TableName)
+	sqlStatement, err := db.Query("SELECT cpf,dtultcompra,lojamaisfreq, lojaultcompra FROM " + dbconfig.TableName)
 	checkErr(err)
 
 	indice := 0
@@ -84,7 +106,7 @@ func SqlSelect() map[int]Compra {
 
 		var compra Compra
 
-		err = sqlStatement.Scan(&compra.CPF, &compra.DtUltCompra, &compra.LojaMaisFreq)
+		err = sqlStatement.Scan(&compra.CPF, &compra.DtUltCompra, &compra.LojaMaisFreq, &compra.LojaUltComp)
 		checkErr(err)
 
 		dadosCompras[indice+1] = compra

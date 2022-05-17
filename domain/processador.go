@@ -63,10 +63,12 @@ func ProcessarDados(dados []string) map[int]Compra {
 		ticketUltcomp := converterValor(dado[87:111])
 		lojaultcomp := strings.TrimSpace(dado[111:130])
 		lojmaisfreq := strings.TrimSpace(dado[131:])
-		dadosCompras[i+1] = Compra{CPF: cpf, Private: private, Incompleto: incompleto, DtUltCompra: dataCompra, TicketMedio: tiketmedio, TicketUltComp: ticketUltcomp, LojaMaisFreq: lojmaisfreq, LojaUltComp: lojaultcomp}
+		//dadosCompras[i+1] = Compra{CPF: cpf, Private: private, Incompleto: incompleto, DtUltCompra: dataCompra, TicketMedio: tiketmedio, TicketUltComp: ticketUltcomp, LojaMaisFreq: lojmaisfreq, LojaUltComp: lojaultcomp}
+		compra := Compra{CPF: cpf, Private: private, Incompleto: incompleto, DtUltCompra: dataCompra, TicketMedio: tiketmedio, TicketUltComp: ticketUltcomp, LojaMaisFreq: lojmaisfreq, LojaUltComp: lojaultcomp}
+		dadosCompras[i+1] = compra
 		//fmt.Println("Compra é do tipo ", reflect.TypeOf(compra))
-		InserirDadosBancoCompra(cpf, private, incompleto, dataCompra, tiketmedio, ticketUltcomp, lojmaisfreq, lojaultcomp)
-		//inserirDadosBanco(cpf, private, incompleto, dataCompra, tiketmedio, ticketUltcomp, lojmaisfreq, lojaultcomp)
+		InserirDadosDeCompra(compra)
+		//InserirDadosBancoCompra(cpf, private, incompleto, dataCompra, tiketmedio, ticketUltcomp, lojmaisfreq, lojaultcomp)
 	}
 	return dadosCompras
 }
@@ -87,14 +89,29 @@ func converterValor(valor string) float64 {
 	}
 }
 
-func ValidarDadosCPF() {
+func ValidarDadosBanco() {
 	dadosCompras := make(map[int]Compra)
 	dadosCompras = SqlSelect()
 	for _, dado := range dadosCompras {
+		//valida o CPF
 		if valid.IsCPF(dado.CPF) {
 			fmt.Print(dado.CPF, " Valido -- ")
 		} else {
 			fmt.Print(dado.CPF, " Invalido -- ")
 		}
+		//valida os CNPJs da loja da loja mais frequente
+		if valid.IsCNPJ(dado.LojaMaisFreq) {
+			fmt.Print(dado.LojaMaisFreq, " Valido -- ")
+		} else {
+			fmt.Print(dado.LojaMaisFreq, " Invalido -- ")
+		}
+
+		//valida os CNPJs da loja da ultima compra
+		if valid.IsCNPJ(dado.LojaUltComp) {
+			fmt.Print(dado.LojaUltComp, " Valido -- ")
+		} else {
+			fmt.Print(dado.LojaUltComp, " Invalido -- ")
+		}
+		fmt.Print('\n')
 	}
 }
