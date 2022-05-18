@@ -15,7 +15,7 @@ import (
 func LeArquivo() []string {
 	var compras []string
 	//para abrir um arquivo usa-se o metodo Open do pacote OS
-	arquivo, err := os.Open("Teste_BaseMenor.txt")
+	arquivo, err := os.Open("Teste_Base.txt")
 	if err != nil {
 		fmt.Println("Ocorreu um erro:", err)
 		os.Exit(1)
@@ -55,7 +55,7 @@ func ProcessarDados(dados []string) map[int]Compra {
 	dadosCompras := make(map[int]Compra)
 	fmt.Println("Iniciado a inserção dos dados")
 	for i, dado := range dados {
-		cpf := dado[0:14]
+		cpf := strings.TrimSpace(dado[0:19])
 		private, _ := strconv.Atoi(dado[20:21])
 		incompleto, _ := strconv.Atoi(dado[32:33])
 		dataCompra := strings.TrimSpace(dado[43:54])
@@ -92,26 +92,37 @@ func converterValor(valor string) float64 {
 func ValidarDadosBanco() {
 	dadosCompras := make(map[int]Compra)
 	dadosCompras = SqlSelect()
+	invalido := ""
 	for _, dado := range dadosCompras {
 		//valida o CPF
-		if valid.IsCPF(dado.CPF) {
-			fmt.Print(dado.CPF, " Valido -- ")
-		} else {
-			fmt.Print(dado.CPF, " Invalido -- ")
+		if !valid.IsCPF(dado.CPF) {
+			invalido = "CPF: " + dado.CPF + ";"
 		}
 		//valida os CNPJs da loja da loja mais frequente
-		if valid.IsCNPJ(dado.LojaMaisFreq) {
-			fmt.Print(dado.LojaMaisFreq, " Valido -- ")
-		} else {
-			fmt.Print(dado.LojaMaisFreq, " Invalido -- ")
+		if !valid.IsCNPJ(dado.LojaMaisFreq) && dado.LojaMaisFreq != "NULL" {
+			invalido = "CNPJ: " + invalido + dado.LojaMaisFreq + ";"
 		}
 
 		//valida os CNPJs da loja da ultima compra
-		if valid.IsCNPJ(dado.LojaUltComp) {
-			fmt.Print(dado.LojaUltComp, " Valido -- ")
-		} else {
-			fmt.Print(dado.LojaUltComp, " Invalido -- ")
+		if !valid.IsCNPJ(dado.LojaUltComp) && dado.LojaUltComp != "NULL" {
+			invalido = "CNPJ: " + invalido + dado.LojaUltComp + ";"
 		}
-		fmt.Print('\n')
+
+		if invalido != "" {
+			registrarDocumentosInconsistentes(invalido + "\n")
+			invalido = ""
+		}
 	}
+}
+
+func registrarDocumentosInconsistentes(linha string) {
+	//para abrir um arquivo e caso não exista cria-lo usa-se a função
+	//OpenFile que vc passa como segundo parametro o que deve ser feito, como so ler, escrever, ou caso não exista criado
+	//o ultimo parametro é o da permissão do arquivo
+	arquivo, err := os.OpenFile("docs_inconsistentes.txt", os.O_RDONLY|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		fmt.Println("Ocorreu um erro:", err)
+	}
+	//Escreve a linha do arquivo e após pula a linha
+	arquivo.WriteString(linha)
 }
