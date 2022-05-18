@@ -5,9 +5,6 @@ import (
 
 	//classe com o dominio
 	compra "github.com/moatsalvador/Projeto_GO/domain"
-
-	// driver postgres
-	_ "github.com/lib/pq"
 )
 
 func checkErr(err error) {

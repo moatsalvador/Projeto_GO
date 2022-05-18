@@ -89,15 +89,18 @@ func converterValor(valor string) float64 {
 	}
 }
 
+//Valida os dados de CPF e CNPJ do banco de dados e insere em um arquivo txt
 func ValidarDadosBanco() {
 	dadosCompras := make(map[int]Compra)
 	dadosCompras = SqlSelect()
 	invalido := ""
 	for _, dado := range dadosCompras {
+
 		//valida o CPF
 		if !valid.IsCPF(dado.CPF) {
 			invalido = "CPF: " + dado.CPF + ";"
 		}
+
 		//valida os CNPJs da loja da loja mais frequente
 		if !valid.IsCNPJ(dado.LojaMaisFreq) && dado.LojaMaisFreq != "NULL" {
 			invalido = "CNPJ: " + invalido + dado.LojaMaisFreq + ";"
