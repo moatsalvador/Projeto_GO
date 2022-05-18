@@ -89,29 +89,43 @@ func converterValor(valor string) float64 {
 	}
 }
 
+//Valida os dados de CPF e CNPJ do banco de dados e insere em um arquivo txt
 func ValidarDadosBanco() {
+	documentoinvalido := " "
 	dadosCompras := make(map[int]Compra)
 	dadosCompras = SqlSelect()
 	for _, dado := range dadosCompras {
-		//valida o CPF
-		if valid.IsCPF(dado.CPF) {
-			fmt.Print(dado.CPF, " Valido -- ")
-		} else {
-			fmt.Print(dado.CPF, " Invalido -- ")
+		documentoinvalido = ""
+		//valida o CPF e isere em um arquivo de registro de invalidos
+		if !valid.IsCPF(dado.CPF) {
+			documentoinvalido = dado.CPF + " "
 		}
+
 		//valida os CNPJs da loja da loja mais frequente
-		if valid.IsCNPJ(dado.LojaMaisFreq) {
-			fmt.Print(dado.LojaMaisFreq, " Valido -- ")
-		} else {
-			fmt.Print(dado.LojaMaisFreq, " Invalido -- ")
+		if !valid.IsCNPJ(dado.LojaMaisFreq) {
+			documentoinvalido = documentoinvalido + ";" + dado.LojaMaisFreq + " "
 		}
 
 		//valida os CNPJs da loja da ultima compra
-		if valid.IsCNPJ(dado.LojaUltComp) {
-			fmt.Print(dado.LojaUltComp, " Valido -- ")
-		} else {
-			fmt.Print(dado.LojaUltComp, " Invalido -- ")
+		if !valid.IsCNPJ(dado.LojaUltComp) {
+			documentoinvalido = documentoinvalido + ";" + dado.LojaMaisFreq + " "
 		}
-		fmt.Print('\n')
+
+		if documentoinvalido != "" {
+			registraArquivoDocumentos(documentoinvalido + "\n")
+		}
 	}
+}
+
+func registraArquivoDocumentos(linha string) {
+	//para abrir um arquivo e caso não exista cria-lo usa-se a função
+	//OpenFile que vc passa como segundo parametro o que deve ser feito, como so ler, escrever, ou caso não exista criado
+	//o ultimo parametro é o da permissão do arquivo
+	arquivo, err := os.OpenFile("documentosInvalidos.txt", os.O_RDONLY|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		fmt.Println("Ocorreu um erro:", err)
+	}
+	//Escreve a linha do arquivo e após pula a linha
+	arquivo.WriteString(linha)
+	//	fmt.Println(arquivo)
 }
